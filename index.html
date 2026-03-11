@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天选城市 - 趣味测试</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7CB9E8;
+            --secondary: #B8D4E3;
+            --accent: #FFB5BA;
+            --bg: #F7FAFC;
+            --card-bg: #FFFFFF;
+            --text: #2D3748;
+            --text-light: #718096;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #F7FAFC 0%, #E8F4F8 50%, #FEF6F7 100%);
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* 背景装饰 */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-decoration::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(124, 185, 232, 0.15) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-decoration::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -20%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(255, 181, 186, 0.15) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(5deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 封面页 */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cover {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 60px rgba(124, 185, 232, 0.3);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(124, 185, 232, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 25px 80px rgba(124, 185, 232, 0.4); }
+        }
+
+        .logo svg {
+            width: 60px;
+            height: 60px;
+            fill: white;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, #5BA3D9 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(124, 185, 232, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(124, 185, 232, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 进度条 */
+        .progress-container {
+            margin-bottom: 40px;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* 题目卡片 */
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 60px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .question-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .option {
+            padding: 18px 24px;
+            background: var(--bg);
+            border: 2px solid transparent;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .option:hover {
+            background: var(--card-bg);
+            border-color: var(--secondary);
+            transform: translateX(8px);
+        }
+
+        .option-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--bg) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        /* 结果页 */
+        .result {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--accent) 0%, #FFD4D8 100%);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #D66;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        .city-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .city-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .city-card:nth-child(1) { animation-delay: 0.1s; }
+        .city-card:nth-child(2) { animation-delay: 0.2s; }
+        .city-card:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .city-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        }
+
+        .city-card.first {
+            border: 2px solid var(--accent);
+            background: linear-gradient(135deg, #FFF5F6 0%, var(--card-bg) 100%);
+        }
+
+        .city-rank {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .city-card.first .city-rank {
+            background: linear-gradient(135deg, var(--accent) 0%, #FFD4D8 100%);
+            color: #D66;
+        }
+
+        .city-card:not(.first) .city-rank {
+            background: var(--bg);
+            color: var(--text-light);
+        }
+
+        .city-info {
+            text-align: left;
+            flex: 1;
+        }
+
+        .city-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .city-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .city-match {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary);
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .title { font-size: 2rem; }
+            .question-card { padding: 30px 20px; }
+            .question-title { font-size: 1.3rem; }
+            .city-card { padding: 20px; }
+            .btn { padding: 14px 36px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration"></div>
+    
+    <div class="container">
+        <!-- 封面页 -->
+        <div class="page active" id="page-cover">
+            <div class="cover">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                </div>
+                <h1 class="title">天选城市</h1>
+                <p class="subtitle">5道题告诉你<br>哪座城市与你最契合</p>
+                <button class="btn" onclick="startTest()">开始测试</button>
+            </div>
+        </div>
+
+        <!-- 答题页 -->
+        <div class="page" id="page-question">
+            <div class="progress-container">
+                <div class="progress-text">
+                    <span>问题 <span id="current-q">1</span>/5</span>
+                    <span id="progress-percent">20%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 20%"></div>
+                </div>
+            </div>
+            <div class="question-card">
+                <div class="question-number" id="q-number">问题 1</div>
+                <h2 class="question-title" id="q-title"></h2>
+                <div class="options" id="options"></div>
+            </div>
+        </div>
+
+        <!-- 结果页 -->
+        <div class="page" id="page-result">
+            <div class="result">
+                <div class="result-badge">✨ 你的天选城市</div>
+                <h2 class="result-title">根据你的回答，这些城市与你最匹配：</h2>
+                <div class="city-list" id="city-list"></div>
+                <div class="result-actions">
+                    <button class="btn" onclick="shareResult()">分享结果</button>
+                    <button class="btn btn-secondary" onclick="restartTest()">重新测试</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 题目数据
+        const questions = [
+            {
+                title: "你更喜欢哪种天气？",
+                options: [
+                    { icon: "☀️", text: "阳光明媚，温暖舒适", cityScores: { "大理": 3, "三亚": 3, "厦门": 3, "青岛": 2, "成都": 2, "杭州": 2, "丽江": 2, "西安": 1 } },
+                    { icon: "🌧️", text: "细雨绵绵，浪漫诗意", cityScores: { "杭州": 3, "苏州": 3, "成都": 3, "厦门": 2, "大理": 2, "丽江": 2, "上海": 1, "西安": 1 } },
+                    { icon: "❄️", text: "银装素裹 snowy", cityScores: { "哈尔滨": 3, "长春": 3, "沈阳": 2, "乌鲁木齐": 2, "北京": 1 } },
+                    { icon: "🌤️", text: "四季如春，温和宜人", cityScores: { "昆明": 3, "大理": 3, "丽江": 2, "三亚": 2, "厦门": 2, "深圳": 1, "杭州": 1 } }
+                ]
+            },
+            {
+                title: "你喜欢的美食风格？",
+                options: [
+                    { icon: "🍜", text: "麻辣鲜香，重口味", cityScores: { "成都": 3, "重庆": 3, "长沙": 2, "武汉": 2, "西安": 1 } },
+                    { icon: "🥘", text: "清淡鲜美，养生健康", cityScores: { "广州": 3, "厦门": 3, "杭州": 2, "苏州": 2, "昆明": 2, "大理": 1, "丽江": 1 } },
+                    { icon: "🍖", text: "豪爽大气，肉食为主", cityScores: { "哈尔滨": 3, "长春": 3, "沈阳": 2, "北京": 2, "青岛": 2, "新疆": 1 } },
+                    { icon: "🥗", text: "精致清淡，讲究摆盘", cityScores: { "上海": 3, "杭州": 2, "苏州": 2, "北京": 2, "成都": 1, "厦门": 1 } }
+                ]
+            },
+            {
+                title: "你向往怎样的生活方式？",
+                options: [
+                    { icon: "🏙️", text: "繁华都市，机遇无限", cityScores: { "上海": 3, "北京": 3, "深圳": 3, "广州": 2, "杭州": 2, "成都": 1 } },
+                    { icon: "🏞️", text: "山水田园，悠闲自在", cityScores: { "大理": 3, "丽江": 3, "杭州": 2, "苏州": 2, "桂林": 2, "厦门": 1, "昆明": 1 } },
+                    { icon: "🏖️", text: "海滨浪漫，舒适惬意", cityScores: { "三亚": 3, "厦门": 3, "青岛": 2, "大连": 2, "深圳": 1 } },
+                    { icon: "🏯", text: "历史文化底蕴深厚", cityScores: { "西安": 3, "北京": 3, "苏州": 2, "南京": 2, "洛阳": 2, "杭州": 1 } }
+                ]
+            },
+            {
+                title: "你更看重城市的什么？",
+                options: [
+                    { icon: "💰", text: "经济发展，就业机会", cityScores: { "上海": 3, "北京": 3, "深圳": 3, "广州": 2, "杭州": 2, "成都": 1 } },
+                    { icon: "🎭", text: "文化氛围，艺术气息", cityScores: { "北京": 3, "上海": 2, "成都": 2, "杭州": 2, "西安": 1, "苏州": 1 } },
+                    { icon: "🌿", text: "自然环境，生态环境", cityScores: { "大理": 3, "丽江": 2, "厦门": 2, "昆明": 2, "杭州": 2, "三亚": 1, "桂林": 1 } },
+                    { icon: "🏛️", text: "教育资源，学术氛围", cityScores: { "北京": 3, "上海": 3, "杭州": 2, "南京": 2, "武汉": 2, "西安": 1 } }
+                ]
+            },
+            {
+                title: "如果去旅行，你会选择？",
+                options: [
+                    { icon: "📸", text: "打卡网红景点，拍美照", cityScores: { "厦门": 3, "三亚": 2, "丽江": 2, "大理": 2, "青岛": 2, "杭州": 1 } },
+                    { icon: "📚", text: "探访博物馆，了解历史", cityScores: { "西安": 3, "北京": 3, "南京": 2, "洛阳": 2, "苏州": 1, "杭州": 1 } },
+                    { icon: "🚶", text: "漫步老街，感受烟火气", cityScores: { "成都": 3, "重庆": 2, "厦门": 2, "杭州": 2, "苏州": 2, "广州": 1 } },
+                    { icon: "🧘", text: "放松身心，远离喧嚣", cityScores: { "大理": 3, "丽江": 3, "昆明": 2, "三亚": 2, "桂林": 1, "苏州": 1 } }
+                ]
+            }
+        ];
+
+        // 城市数据
+        const cities = {
+            "大理": { desc: "风花雪月，文艺青年的乌托邦" },
+            "三亚": { desc: "碧海蓝天，度假天堂" },
+            "厦门": { desc: "文艺浪漫，闽南风情" },
+            "青岛": { desc: "红瓦绿树，啤酒飘香" },
+            "成都": { desc: "天府之国，悠闲生活" },
+            "杭州": { desc: "人间天堂，西湖美景" },
+            "丽江": { desc: "古城韵味，纳西风情" },
+            "西安": { desc: "千年古都，历史厚重" },
+            "苏州": { desc: "江南水乡，园林之美" },
+            "昆明": { desc: "春城无处不飞花" },
+            "重庆": { desc: "山城雾都，魔幻现实" },
+            "长沙": { desc: "湘江之都，娱乐之都" },
+            "哈尔滨": { desc: "冰城夏都，欧陆风情" },
+            "上海": { desc: "魔都繁华，国际都市" },
+            "北京": { desc: "帝都沧桑，文化中心" },
+            "深圳": { desc: "创新之城，活力无限" },
+            "广州": { desc: "花城美食，岭南文化" },
+            "南京": { desc: "六朝古都，秦淮风月" },
+            "桂林": { desc: "山水甲天下" },
+            "大连": { desc: "浪漫滨城，北方香港" },
+            "长春": { desc: "北国春城，电影之城" },
+            "沈阳": { desc: "工业重镇，皇家气象" },
+            "乌鲁木齐": { desc: "亚心之都，丝路明珠" },
+            "洛阳": { desc: "十三朝古都，牡丹花城" },
+            "武汉": { desc: "江城武汉，九省通衢" },
+            "新疆": { desc: "大美新疆，异域风情" }
+        };
+
+        // 状态
+        let currentQuestion = 0;
+        let scores = {};
+
+        // 初始化
+        function init() {
+            // 初始化分数
+            Object.keys(cities).forEach(city => {
+                scores[city] = 0;
+            });
+        }
+
+        // 开始测试
+        function startTest() {
+            init();
+            currentQuestion = 0;
+            showPage('page-question');
+            renderQuestion();
+        }
+
+        // 显示页面
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // 渲染题目
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('current-q').textContent = currentQuestion + 1;
+            document.getElementById('progress-percent').textContent = ((currentQuestion + 1) / 5 * 100) + '%';
+            document.getElementById('progress-fill').style.width = ((currentQuestion + 1) / 5 * 100) + '%';
+            document.getElementById('q-number').textContent = `问题 ${currentQuestion + 1}`;
+            document.getElementById('q-title').textContent = q.title;
+
+            const optionsHtml = q.options.map((opt, i) => `
+                <div class="option" onclick="selectOption(${i})">
+                    <div class="option-icon">${opt.icon}</div>
+                    <span>${opt.text}</span>
+                </div>
+            `).join('');
+            document.getElementById('options').innerHTML = optionsHtml;
+        }
+
+        // 选择答案
+        function selectOption(optionIndex) {
+            const q = questions[currentQuestion];
+            const selected = q.options[optionIndex];
+
+            // 更新分数
+            Object.entries(selected.cityScores).forEach(([city, score]) => {
+                if (scores[city] !== undefined) {
+                    scores[city] += score;
+                }
+            });
+
+            // 下一题或显示结果
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // 显示结果
+        function showResult() {
+            showPage('page-result');
+
+            // 排序获取Top 3
+            const sorted = Object.entries(scores)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+
+            const maxScore = sorted[0][1];
+            const cityListHtml = sorted.map(([city, score], index) => {
+                const matchRate = Math.round((score / maxScore) * 100);
+                const isFirst = index === 0;
+                const cityData = cities[city] || { desc: "" };
+                
+                return `
+                    <div class="city-card ${isFirst ? 'first' : ''}">
+                        <div class="city-rank">${index + 1}</div>
+                        <div class="city-info">
+                            <div class="city-name">${city}</div>
+                            <div class="city-desc">${cityData.desc}</div>
+                        </div>
+                        <div class="city-match">${matchRate}%</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('city-list').innerHTML = cityListHtml;
+        }
+
+        // 分享结果
+        function shareResult() {
+            const sorted = Object.entries(scores)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            const text = `我的天选城市是${sorted[0][0]}！\n快来测测你的天选城市是什么吧~`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('结果已复制到剪贴板！');
+                });
+            } else {
+                prompt('复制以下内容分享:', text);
+            }
+        }
+
+        // 重新测试
+        function restartTest() {
+            startTest();
+        }
+    </script>
+</body>
+</html>
